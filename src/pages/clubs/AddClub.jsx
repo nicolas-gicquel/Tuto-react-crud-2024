@@ -25,6 +25,10 @@ const AddClub = () => {
     formData.append("nameClub", nameClub);
     formData.append("logoClub", logoClub);
 
+    for (var pair of formData.entries()) {
+      console.log(pair[0]+ ', ' + pair[1]); 
+  }
+
     await axios
       .post(`http://127.0.0.1:8000/api/clubs`, formData,
         {

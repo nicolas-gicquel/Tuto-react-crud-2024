@@ -6,17 +6,55 @@ import axios from "axios";
 import { Link } from 'react-router-dom';
 const Clubs = () => {
   const [clubs, setClubs] = useState([]);
+  const [user, setUser] = useState(null);
+  const token = localStorage.getItem("access_token");
+
   useEffect(() => {
-    displayClubs();
+    // displayClubs();
+    fetchUser()
   }, []); // Sans les crochets ça tourne en boucle
   const displayClubs = async () => {
-    await axios.get("http://127.0.0.1:8000/api/clubs").then((res) => {
+    await axios.get("http://127.0.0.1:8000/api/clubs", {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    },).then((res) => {
       setClubs(res.data);
     });
   };
   const deleteClub = (id) => {
-    axios.delete(`http://127.0.0.1:8000/api/clubs/${id}`).then(displayClubs);
+    axios.delete(`http://127.0.0.1:8000/api/clubs/${id}`, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(displayClubs);
   };
+
+  const fetchUser = async () => {
+    if (!token) {
+      console.error("Token non disponible");
+      return;
+    }
+  
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/currentuser", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      console.log("Réponse de l'API:", response.data);
+      setUser(response.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur:", error);
+      if (error.response) {
+        console.error("Détails de la réponse d'erreur:", error.response);
+      }
+    }
+
+  }
   return (
     <div>
       <Menu />
